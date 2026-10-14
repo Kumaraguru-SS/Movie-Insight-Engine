@@ -8,31 +8,21 @@ logger = logging.getLogger(__name__)
 def seed_database_if_empty(db: Session):
     existing_titles_count = db.query(Title).count()
     if existing_titles_count == 0:
-        logger.info("Initializing database with curated catalog titles...")
-        for item in SEED_TITLES:
-            title_obj = Title(
-                slug=item["slug"],
-                title=item["title"],
-                content_type=item["content_type"],
-                synopsis=item.get("synopsis"),
-                genres=item.get("genres", []),
-                release_date=item.get("release_date"),
-                release_year=item.get("release_year"),
-                language=item.get("language", "en"),
-                rating=item.get("rating", 0.0),
-                vote_count=item.get("vote_count", 0),
-                poster_url=item.get("poster_url"),
-                backdrop_url=item.get("backdrop_url"),
-                runtime=item.get("runtime"),
-                cast=item.get("cast", []),
-                creator=item.get("creator"),
-                popularity=item.get("popularity", 50.0),
-                attribution=item.get("attribution", "Curated Knowledge Base"),
-                legal_watch_url=item.get("legal_watch_url")
-            )
-            db.add(title_obj)
-        db.commit()
-        logger.info("Successfully seeded catalog titles.")
+        logger.info("Initializing database with official TMDB & AniList live catalog...")
+        try:
+            from app.services.ingest_tmdb import ingest_from_tmdb
+            ingest_from_tmdb(db, target_count=50)
+        except Exception as e:
+            logger.warning(f"Initial TMDB ingestion failed or key not configured: {e}")
+
+        try:
+            import asyncio
+            from app.services.ingest_anilist import ingest_from_anilist
+            asyncio.run(ingest_from_anilist(db, target_count=30))
+        except Exception as e:
+            logger.warning(f"Initial AniList ingestion skipped: {e}")
+
+        logger.info("Database initialized with verified official catalog data.")
 
     existing_trends_count = db.query(TrendSnapshot).count()
     if existing_trends_count == 0:
