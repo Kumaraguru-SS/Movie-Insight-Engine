@@ -13,6 +13,7 @@ class Settings(BaseSettings):
 
     TMDB_API_KEY: str = ""
     JIKAN_BASE_URL: str = "https://api.jikan.moe/v4"
+    MAL_CLIENT_ID: str = ""
 
     CORS_ORIGINS: Union[str, List[str]] = "http://localhost:5173,http://127.0.0.1:5173"
     LOG_LEVEL: str = "INFO"

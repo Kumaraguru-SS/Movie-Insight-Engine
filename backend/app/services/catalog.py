@@ -5,6 +5,7 @@ from app.models.entities import Title
 from app.providers.tmdb import TMDBProvider
 from app.providers.anime import JikanAnimeProvider
 from app.providers.anilist import AniListProvider
+from app.providers.mal import MyAnimeListProvider
 import logging
 import math
 
@@ -16,6 +17,7 @@ class CatalogService:
         self.tmdb = TMDBProvider()
         self.jikan = JikanAnimeProvider()
         self.anilist = AniListProvider()
+        self.mal = MyAnimeListProvider()
 
     def search_titles(
         self,
