@@ -180,6 +180,49 @@ export default function Trends() {
         </div>
       </div>
 
+      {/* Cross-Platform ML Trend Forecasting Intelligence */}
+      {trends?.platform_signals && (
+        <div style={{ marginBottom: 30 }}>
+          <div className="glass-panel" style={{ padding: 24, marginBottom: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <TrendingUp size={20} color="#00f2fe" /> Multi-Source Entertainment Velocity (ML Model)
+                </h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  Aggregated signals from YouTube, SIMKL, Reddit, X (Twitter), Twitch, and Discord analyzed by GradientBoosting Regressor.
+                </p>
+              </div>
+              {trends.ml_forecast && (
+                <div style={{ background: 'rgba(0, 242, 254, 0.1)', border: '1px solid rgba(0, 242, 254, 0.3)', padding: '6px 14px', borderRadius: 20, fontSize: '0.8rem', color: '#00f2fe', fontWeight: 600 }}>
+                  Breakout Probability: {trends.ml_forecast.breakout_probability}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 16 }}>
+              {trends.platform_signals.map((sig, i) => (
+                <div key={i} style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-subtle)', borderRadius: 12, padding: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.95rem', color: '#fff' }}>{sig.platform}</span>
+                    <span style={{ fontSize: '0.7rem', color: '#00f2fe', background: 'rgba(0, 242, 254, 0.1)', padding: '2px 8px', borderRadius: 10 }}>
+                      Weight {sig.weight}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: 10, minHeight: 32 }}>
+                    {sig.metric}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f8fafc' }}>{sig.score}</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#10b981' }}>{sig.status}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Trending Genres Table */}
       <div className="glass-panel" style={{ padding: 24 }}>
         <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: 16 }}>

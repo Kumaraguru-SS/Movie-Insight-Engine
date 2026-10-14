@@ -169,6 +169,8 @@ class TrendOverviewResponse(BaseModel):
     data_source: str
     is_demo: bool
     coverage_notes: str
+    platform_signals: Optional[List[dict]] = None
+    ml_forecast: Optional[dict] = None
 
 # Health Schema
 class HealthResponse(BaseModel):
