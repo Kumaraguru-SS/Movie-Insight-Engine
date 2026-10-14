@@ -45,13 +45,23 @@ export function AuthProvider({ children }) {
     return res.user;
   };
 
+  const loginWithGoogle = async (googlePayload) => {
+    const res = await authApi.googleLogin(googlePayload);
+    if (!res || !res.access_token) {
+      throw new Error(res?.detail || 'Google sign-in failed: backend returned no access token.');
+    }
+    localStorage.setItem('mie_token', res.access_token);
+    setUser(res.user);
+    return res.user;
+  };
+
   const logout = () => {
     localStorage.removeItem('mie_token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, loading, login, register, loginWithGoogle, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );

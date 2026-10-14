@@ -12,6 +12,12 @@ class UserLoginRequest(BaseModel):
     username: str
     password: str
 
+class GoogleAuthRequest(BaseModel):
+    credential: Optional[str] = None
+    email: Optional[EmailStr] = None
+    name: Optional[str] = None
+    google_id: Optional[str] = None
+
 class UserResponse(BaseModel):
     id: int
     username: str

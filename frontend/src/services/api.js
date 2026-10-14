@@ -38,6 +38,7 @@ export async function apiRequest(endpoint, options = {}) {
 export const authApi = {
   register: (payload) => apiRequest('/api/v1/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   login: (payload) => apiRequest('/api/v1/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
+  googleLogin: (payload) => apiRequest('/api/v1/auth/google', { method: 'POST', body: JSON.stringify(payload) }),
   getMe: () => apiRequest('/api/v1/auth/me')
 };
 
