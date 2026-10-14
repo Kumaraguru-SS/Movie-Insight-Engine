@@ -27,6 +27,9 @@ export function AuthProvider({ children }) {
 
   const login = async (username, password) => {
     const res = await authApi.login({ username, password });
+    if (!res || !res.access_token) {
+      throw new Error(res?.detail || 'Authentication failed: backend returned no access token.');
+    }
     localStorage.setItem('mie_token', res.access_token);
     setUser(res.user);
     return res.user;
@@ -34,6 +37,9 @@ export function AuthProvider({ children }) {
 
   const register = async (username, email, password) => {
     const res = await authApi.register({ username, email, password });
+    if (!res || !res.access_token) {
+      throw new Error(res?.detail || 'Registration failed: backend returned no access token.');
+    }
     localStorage.setItem('mie_token', res.access_token);
     setUser(res.user);
     return res.user;

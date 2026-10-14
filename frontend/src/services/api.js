@@ -1,4 +1,8 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+let rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+if (rawBaseUrl && !rawBaseUrl.startsWith('http://') && !rawBaseUrl.startsWith('https://')) {
+  rawBaseUrl = `https://${rawBaseUrl}`;
+}
+const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('mie_token');
@@ -8,7 +12,8 @@ export async function apiRequest(endpoint, options = {}) {
     ...(options.headers || {})
   };
 
-  const url = `${API_BASE_URL}${endpoint}`;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  const url = `${API_BASE_URL}${cleanEndpoint}`;
   try {
     const res = await fetch(url, { ...options, headers });
     if (res.status === 204) {
@@ -18,6 +23,9 @@ export async function apiRequest(endpoint, options = {}) {
     if (!res.ok) {
       const errorMsg = data?.detail || `HTTP Error ${res.status}`;
       throw new Error(errorMsg);
+    }
+    if (!data) {
+      throw new Error('Server returned an empty or invalid response.');
     }
     return data;
   } catch (err) {
