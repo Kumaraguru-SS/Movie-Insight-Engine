@@ -1,0 +1,47 @@
+services:
+  # ----------------------------------------------------
+  # 1. Backend Web Service (FastAPI)
+  # ----------------------------------------------------
+  - type: web
+    name: movie-insight-backend
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_NAME
+        value: "Movie Insight Engine"
+      - key: APP_SECRET_KEY
+        generateValue: true
+      - key: LOG_LEVEL
+        value: INFO
+      - key: DATABASE_URL
+        value: "sqlite:///./movie_insight.db"
+      - key: CORS_ORIGINS
+        # Update this to your frontend URL once deployed, or set to * for initial test
+        value: "*"
+
+  # ----------------------------------------------------
+  # 2. Frontend Static Site (React / Vite)
+  # ----------------------------------------------------
+  - type: static_site
+    name: movie-insight-frontend
+    rootDir: frontend
+    plan: free
+    buildCommand: "npm install && npm run build"
+    staticPublishPath: "./dist"
+    routes:
+      # SPA rewrite rule so React Router routes load cleanly
+      - type: rewrite
+        source: "/*"
+        destination: "/index.html"
+    envVars:
+      - key: VITE_API_BASE_URL
+        # Set this to your backend Render URL (e.g., https://movie-insight-backend.onrender.com)
+        fromService:
+          type: web
+          name: movie-insight-backend
+          property: host
