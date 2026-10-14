@@ -39,17 +39,16 @@ export default function Navbar() {
       }}>
         {/* Brand */}
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <div style={{
-            background: '#ffffff',
-            padding: 8,
-            borderRadius: 12,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 0 15px rgba(255, 255, 255, 0.2)'
-          }}>
-            <Sparkles size={20} color="#000000" />
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="Movie Insight Engine Logo" 
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              objectFit: 'cover'
+            }} 
+          />
           <div>
             <span style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.03em' }} className="font-display">
               Movie<span className="gradient-text">Insight</span>
