@@ -7,6 +7,14 @@ Computes offline ranking and discovery metrics:
 4. Cross-Genre Discovery Acceptance simulation
 """
 
+import os
+import sys
+
+# Ensure backend directory is in sys.path
+backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "backend"))
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
+
 import numpy as np
 from app.db.session import SessionLocal
 from app.models.entities import User, UserPreference, Title

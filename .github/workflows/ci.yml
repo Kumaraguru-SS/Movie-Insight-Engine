@@ -28,13 +28,11 @@ jobs:
       - name: Run Backend Pytest Suite
         run: |
           cd backend
-          pytest tests
+          python -m pytest tests
 
       - name: Run Recommendation Evaluation Script
         run: |
-          cd backend
-          export PYTHONPATH=.
-          python ../ml/evaluate_recommendations.py
+          python ml/evaluate_recommendations.py
 
   frontend-build:
     name: Frontend Build & Lint
