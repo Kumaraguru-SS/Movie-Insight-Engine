@@ -4,6 +4,7 @@ from sqlalchemy import or_, desc, asc
 from app.models.entities import Title
 from app.providers.tmdb import TMDBProvider
 from app.providers.anime import JikanAnimeProvider
+from app.providers.anilist import AniListProvider
 import logging
 import math
 
@@ -14,6 +15,7 @@ class CatalogService:
         self.db = db
         self.tmdb = TMDBProvider()
         self.jikan = JikanAnimeProvider()
+        self.anilist = AniListProvider()
 
     def search_titles(
         self,
