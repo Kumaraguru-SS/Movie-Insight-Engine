@@ -27,8 +27,9 @@ services:
   # ----------------------------------------------------
   # 2. Frontend Static Site (React / Vite)
   # ----------------------------------------------------
-  - type: static_site
+  - type: web
     name: movie-insight-frontend
+    runtime: static
     rootDir: frontend
     plan: free
     buildCommand: "npm install && npm run build"
