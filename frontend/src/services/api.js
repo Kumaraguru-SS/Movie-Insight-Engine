@@ -44,7 +44,13 @@ export const authApi = {
 // Catalog & Titles
 export const titlesApi = {
   list: (params = {}) => {
-    const query = new URLSearchParams(params).toString();
+    const cleanParams = {};
+    for (const [key, value] of Object.entries(params)) {
+      if (value !== undefined && value !== null && value !== '' && value !== 'undefined') {
+        cleanParams[key] = value;
+      }
+    }
+    const query = new URLSearchParams(cleanParams).toString();
     return apiRequest(`/api/v1/titles${query ? `?${query}` : ''}`);
   },
   getDetail: (identifier) => apiRequest(`/api/v1/titles/${identifier}`)
