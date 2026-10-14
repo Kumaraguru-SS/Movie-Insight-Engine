@@ -20,6 +20,8 @@ services:
         value: INFO
       - key: DATABASE_URL
         value: "sqlite:///./movie_insight.db"
+      - key: TMDB_API_KEY
+        value: "d26dbc7a49bfaeac65a59e664d5c97b7"
       - key: CORS_ORIGINS
         # Update this to your frontend URL once deployed, or set to * for initial test
         value: "*"
