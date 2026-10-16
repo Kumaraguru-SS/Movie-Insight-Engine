@@ -29,7 +29,7 @@ services:
     environment:
       APP_ENV: production
       APP_SECRET_KEY: docker-production-secret-min-32-chars-long
-      DATABASE_URL: postgresql+psycopg://postgres:postgrespassword@db:5432/movie_insight
+      DATABASE_URL: postgresql+psycopg2://postgres:postgrespassword@db:5432/movie_insight
       CORS_ORIGINS: http://localhost:3000,http://localhost:5173
       LOG_LEVEL: INFO
     ports:
@@ -39,6 +39,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
     container_name: movie_insight_frontend
     restart: always
     depends_on:

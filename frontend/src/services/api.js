@@ -1,8 +1,11 @@
-let rawBaseUrl = import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+let rawBaseUrl = import.meta.env.VITE_API_BASE_URL;
+if (rawBaseUrl === undefined) {
+  rawBaseUrl = 'http://127.0.0.1:8000';
+}
 if (rawBaseUrl && !rawBaseUrl.startsWith('http://') && !rawBaseUrl.startsWith('https://')) {
   rawBaseUrl = `https://${rawBaseUrl}`;
 }
-const API_BASE_URL = rawBaseUrl.replace(/\/+$/, '');
+const API_BASE_URL = rawBaseUrl ? rawBaseUrl.replace(/\/+$/, '') : '';
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('mie_token');

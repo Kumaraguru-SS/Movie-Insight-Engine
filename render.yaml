@@ -19,7 +19,7 @@ services:
       - key: LOG_LEVEL
         value: INFO
       - key: DATABASE_URL
-        value: "sqlite:///./movie_insight.db"
+        value: postgresql://movie_insight_user:aqaI83VWbkW6glNKtwU6CaSnIdixOm8b@dpg-db86ng8u01pc73eo1t8g-a/movie_insight
       - key: TMDB_API_KEY
         value: "d26dbc7a49bfaeac65a59e664d5c97b7"
       - key: CORS_ORIGINS
@@ -47,3 +47,4 @@ services:
           type: web
           name: movie-insight-backend
           property: host
+

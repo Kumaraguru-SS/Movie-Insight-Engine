@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, RotateCcw, AlertCircle } from 'lucide-react';
+import { Search, Filter, RotateCcw, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import { titlesApi } from '../services/api';
 import TitleCard from '../components/TitleCard';
 
@@ -12,6 +12,9 @@ export default function Explore() {
   const [contentType, setContentType] = useState('all');
   const [genre, setGenre] = useState('all');
   const [sortBy, setSortBy] = useState('popularity');
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(24);
+  const [totalPages, setTotalPages] = useState(1);
   const [titles, setTitles] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -24,10 +27,10 @@ export default function Explore() {
   ];
 
   useEffect(() => {
-    fetchCatalog();
-  }, [contentType, genre, sortBy]);
+    fetchCatalog(query, page);
+  }, [contentType, genre, sortBy, page]);
 
-  const fetchCatalog = async (searchTerm = query) => {
+  const fetchCatalog = async (searchTerm = query, targetPage = page) => {
     setLoading(true);
     setError(null);
     try {
@@ -37,11 +40,12 @@ export default function Explore() {
         genre: genre !== 'all' ? genre : undefined,
         sort_by: sortBy,
         order: 'desc',
-        page: 1,
-        page_size: 40
+        page: targetPage,
+        page_size: pageSize
       });
       setTitles(res.items || []);
       setTotal(res.total || 0);
+      setTotalPages(res.total_pages || Math.ceil((res.total || 0) / pageSize) || 1);
     } catch (err) {
       console.error(err);
       setError('Unable to load catalog results. Please check connection.');
@@ -52,7 +56,17 @@ export default function Explore() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchCatalog(query);
+    if (page === 1) {
+      fetchCatalog(query, 1);
+    } else {
+      setPage(1);
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage < 1 || newPage > totalPages || newPage === page) return;
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleReset = () => {
@@ -61,10 +75,48 @@ export default function Explore() {
     setGenre('all');
     setSortBy('popularity');
     setSearchParams({});
-    titlesApi.list({ page_size: 40 }).then(res => {
+    setPage(1);
+    titlesApi.list({ page: 1, page_size: pageSize }).then(res => {
       setTitles(res.items || []);
       setTotal(res.total || 0);
+      setTotalPages(res.total_pages || Math.ceil((res.total || 0) / pageSize) || 1);
     });
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisibleButtons = 7;
+
+    if (totalPages <= maxVisibleButtons) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+      let start = Math.max(2, page - 1);
+      let end = Math.min(totalPages - 1, page + 1);
+
+      if (page <= 3) {
+        end = 4;
+      } else if (page >= totalPages - 2) {
+        start = totalPages - 3;
+      }
+
+      if (start > 2) {
+        pages.push('...');
+      }
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (end < totalPages - 1) {
+        pages.push('...');
+      }
+
+      pages.push(totalPages);
+    }
+    return pages;
   };
 
   return (
@@ -193,15 +245,118 @@ export default function Explore() {
           <p style={{ color: '#ef4444' }}>{error}</p>
         </div>
       ) : titles.length > 0 ? (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-          gap: 22
-        }}>
-          {titles.map(title => (
-            <TitleCard key={title.id} title={title} />
-          ))}
-        </div>
+        <>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: 22
+          }}>
+            {titles.map(title => (
+              <TitleCard key={title.id} title={title} />
+            ))}
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              marginTop: 48,
+              padding: '16px 20px',
+              flexWrap: 'wrap'
+            }} className="glass-panel">
+              {/* Prev Button */}
+              <button
+                type="button"
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page <= 1}
+                className="btn btn-secondary"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 16px',
+                  fontSize: '0.88rem',
+                  opacity: page <= 1 ? 0.45 : 1,
+                  cursor: page <= 1 ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <ChevronLeft size={16} /> Prev
+              </button>
+
+              {/* Page Number Buttons */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                {getPageNumbers().map((p, idx) => {
+                  if (p === '...') {
+                    return (
+                      <span
+                        key={`ellipsis-${idx}`}
+                        style={{
+                          padding: '0 6px',
+                          color: 'var(--text-muted)',
+                          fontSize: '0.9rem',
+                          userSelect: 'none'
+                        }}
+                      >
+                        …
+                      </span>
+                    );
+                  }
+
+                  const isActive = p === page;
+                  return (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => handlePageChange(p)}
+                      style={{
+                        minWidth: 38,
+                        height: 38,
+                        borderRadius: 'var(--radius-sm)',
+                        fontSize: '0.88rem',
+                        fontWeight: isActive ? 700 : 500,
+                        border: isActive ? '1px solid #ffffff' : '1px solid var(--border-subtle)',
+                        background: isActive ? '#ffffff' : 'var(--bg-secondary)',
+                        color: isActive ? '#000000' : 'var(--text-main)',
+                        cursor: 'pointer',
+                        transition: 'all var(--transition-fast)'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) e.currentTarget.style.borderColor = 'var(--border-subtle)';
+                      }}
+                    >
+                      {p}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Next Button */}
+              <button
+                type="button"
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page >= totalPages}
+                className="btn btn-secondary"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 16px',
+                  fontSize: '0.88rem',
+                  opacity: page >= totalPages ? 0.45 : 1,
+                  cursor: page >= totalPages ? 'not-allowed' : 'pointer'
+                }}
+              >
+                Next <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </>
       ) : (
         <div className="glass-panel" style={{ padding: 50, textAlign: 'center' }}>
           <Filter size={40} color="var(--text-muted)" style={{ margin: '0 auto 14px' }} />
